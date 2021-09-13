@@ -8,48 +8,59 @@ import java.io.*;
 public class IoUtils {
 
     /*
-       读取文本txt，返回字符串
+       读取文本txt文件，返回字符串
      */
     public static String read(String path) throws IOException {
-        StringBuilder result = new StringBuilder();
+
+        //将读出的字符串用StringBuilder连接。
+        StringBuilder builder = new StringBuilder();
         String text=null;
         File afile=new File(path);
         //判断其是否为文件并且是否存在
-        if(afile.isFile() && afile.exists()){
             try{
                 String encoding="UTF-8";
-                FileInputStream fileInputStream = new FileInputStream(afile);
-                InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream,encoding);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                while((text = bufferedReader.readLine()) != null){
-                    result.append(text);
+                if(afile.isFile() && afile.exists()) { //判断读取的文件是否存在和是否为文件类型
+                    FileInputStream fileInputStream = new FileInputStream(afile);
+                    InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, encoding);
+                    BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                    while ((text = bufferedReader.readLine()) != null) {
+                        builder.append(text);
+                    }
+                    //读取流关闭
+                    inputStreamReader.close();
+                    bufferedReader.close();
+                    fileInputStream.close();
                 }
-                inputStreamReader.close();
-                bufferedReader.close();
-                fileInputStream.close();
+                else{
+                    System.out.println("文件不存在或者读取的不是文件");
+                }
             }catch(IOException e){
+                System.out.println("读取文件内容出错");
                 e.printStackTrace();
             }
-        }else{
-            System.out.println("文件不存在或者读取的不是文件");
-        }
-        return result.toString();
+            //返回字符串类型
+        return builder.toString();
     }
 
       public static void write(String path, double resultrate) throws IOException {
-         String result=Double.toString(resultrate);
-
+        //将double类型数据转为String类型
+          String result=Double.toString(resultrate);
           BufferedWriter out=null;
           try{
               out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path,true)));
+              //写入结果并换行
               out.write(result);
+              out.newLine();
           }catch (Exception e){
-
+              System.out.println("写入失败");
+              e.printStackTrace();
           }
           finally {
               try{
+                  //输出流关闭
                   out.close();
               }catch (IOException e){
+                  System.out.println("输出流关闭失败");
                   e.printStackTrace();
               }
           }

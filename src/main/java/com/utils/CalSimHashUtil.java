@@ -1,110 +1,112 @@
 package com.utils;
 
-
 import com.hankcs.hanlp.HanLP;
-
-
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.List;
 
 public class CalSimHashUtil {
 
-/*
-MessageDigest所在包java.security是java提供的加密API
- */
-static char[] hex = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+    //用于计算hash值所用到的函数
+    static char[] hex = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 
     public static String getHash(String str){
+        //判断输入的字符是否为空
         if (str == null || str.length() == 0) {
             return null;
         } else {
             try{
-                MessageDigest md5 = MessageDigest.getInstance("MD5");//申明使用MD5算法
-
+                //实例化一个MessageDigest对象，通过提供的静态的getInstance方法
+                //MessageDigest所在包java.security是java提供的加密API
+                MessageDigest md5 = MessageDigest.getInstance("MD5");
+                //使用MD5算法实现对输入字符串的处理
                 md5.update(str.getBytes());
+                //返回每个词计算后的hash值
                 return hexStrToBinaryStr(byte2str(md5.digest()));
             }catch(Exception e){
+                System.out.println("哈希值生成失败");
                 e.printStackTrace();
             }
         }
         return null;
     }
 
-    public static String hexStrToBinaryStr(String hexString) {
-
+    //将32个16进制数转为128位二进制数
+      public static String hexStrToBinaryStr(String hexString) {
+         //首先判断是否为空
         if (hexString == null || hexString.equals("")) {
             return null;
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuffer buffer = new StringBuffer();
+        int length=hexString.length();
         // 将每一个十六进制字符分别转换成一个四位的二进制字符
-        for (int i = 0; i < hexString.length(); i++) {
+        for (int i = 0; i < length; i++) {
+            //取出16进制数
             String indexStr = hexString.substring(i, i + 1);
             String binaryStr = Integer.toBinaryString(Integer.parseInt(indexStr, 16));
+            //如果不足4位就补足
             while (binaryStr.length() < 4) {
                 binaryStr = "0" + binaryStr;
             }
-            sb.append(binaryStr);
+            buffer.append(binaryStr);
         }
-
-        return sb.toString();
+        return buffer.toString();
     }
 
+    //将byte数组转化为32个16进制数
     private static String byte2str(byte []bytes){
-        int len = bytes.length;
+        int length = bytes.length;
         StringBuffer result = new StringBuffer();
-        for (int i = 0; i < len; i++) {
+        for (int i = 0; i < length; i++) {
             byte byte0 = bytes[i];
-            result.append(hex[byte0 >>> 4 & 0xf]);   // 见下面解释。
+            //每一个字节生成两个16进制数
+            result.append(hex[byte0 >>> 4 & 0xf]);
             result.append(hex[byte0 & 0xf]);
         }
         return result.toString();
     }
 
 
-
-
     public static String getSimHash(String str){
-
+        //先创建一个存储SimHash值的128数组，并初始化为0
         int v[] = new int[128];
-        for(int i=0;i<128;i++)
-            v[i]=0;
-
-        List<String> keywordList = HanLP.extractKeyword(str, str.length());//取出所有关键词
+        Arrays.fill( v, 0);
+        //使用Hanlp中的extractKeyword提取出关键字
+        //HanLP是一系列模型与算法组成的NLP工具包，目标是普及自然语言处理在生产环境中的应用
+        List<String> keywordList = HanLP.extractKeyword(str, str.length());
         int size=keywordList.size();
-
+        //计算字符串的SimHash值
         for(int i=0;i<size;i++){
-            String str_hash=getHash(keywordList.get(i));
-            if(str_hash.length() < 128){
-                int que = 128 - str_hash.length();
+            //计算每一个词的Hash值
+            String hashvalue=getHash(keywordList.get(i));
+            //保证它是128位的二进制
+            if(hashvalue.length() < 128){
+                int que = 128 - hashvalue.length();
                 for(int j=0;j<que;j++){
-                    str_hash = "0" + str_hash;
+                    //补足128位
+                    hashvalue = "0" + hashvalue;
                 }
             }
-            //System.out.println(str_hash);//输出该词的128位MD5哈希值
-            char str_hash_fb[]=str_hash.toCharArray();//将该词的哈希值转为数组，方便检查
-
+            //将该词的哈希值转为数组
+            char str_hash[]=hashvalue.toCharArray();
+            //对每个词的Hash值,如果是1的话加上该词的权重，0的话减去该词的权重
             for(int j=0;j<v.length;j++){
-                if(str_hash_fb[j] == '1'){
-                    v[j]++;//Hash_SZ中，0是最高位，依次排低
+                if(str_hash[j] == '1'){
+                    v[j]++;
                 }else{
                     v[j]--;
                 }
             }
         }
         //将数组中的SimHash值降维，并以字符串形式返回
-        String SimHash_number="";//存储SimHash值
+        StringBuilder builder=new StringBuilder();
         for(int i=0;i<v.length;i++){
             if(v[i]<=0)//小于等于0，就取0
-                SimHash_number += "0";
+                builder.append("0");
             else//大于0，就取1
-                SimHash_number += "1";
+                 builder.append("1");
         }
-
-        return SimHash_number;
+        return builder.toString();
     }
 
 }
