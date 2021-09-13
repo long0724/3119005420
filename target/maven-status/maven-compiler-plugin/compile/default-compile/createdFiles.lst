@@ -1,0 +1,5 @@
+com\main\PaperCheckMain.class
+com\utils\CalSimHashUtil.class
+com\utils\CalSimilarityUtil.class
+com\utils\CalHamDistanceUtil.class
+com\utils\IoUtils.class
