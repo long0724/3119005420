@@ -10,9 +10,7 @@ public class PaperCheckMain {
         String str0 = IoUtils.read(args[0]);
         String str1 = IoUtils.read(args[1]);
         String resultFileName = args[2];
-//        String str0 = IoUtils.read("C:/tests/org.txt");
-//        String str1 = IoUtils.read("C:/tests/org_add.txt");
-//        String resultFileName = "C:/tests/ans.txt";
+
         String simhash1=getSimHash(str0);
         String simhash2=getSimHash(str1);
         System.out.println("simhash1===="+simhash1);

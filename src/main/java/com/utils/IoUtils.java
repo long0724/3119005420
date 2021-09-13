@@ -38,26 +38,21 @@ public class IoUtils {
 
       public static void write(String path, double resultrate) throws IOException {
          String result=Double.toString(resultrate);
-         FileOutputStream fileOutputStream = null;
-         File file = new File(path);
-         if(!file.exists()) file.createNewFile();
-         try{
-             /*
-             这一可能要修改
-             *
-             *
-             *
-             *
-             *
-              */
-            BufferedWriter brout=new BufferedWriter(new FileWriter(file));
-            brout.write(result);
-            brout.newLine();
-            brout.flush();
-            brout.close();
-         }catch (IOException e) {
-             e.printStackTrace();
-         }
+
+          BufferedWriter out=null;
+          try{
+              out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path,true)));
+              out.write(result);
+          }catch (Exception e){
+
+          }
+          finally {
+              try{
+                  out.close();
+              }catch (IOException e){
+                  e.printStackTrace();
+              }
+          }
       }
 
 }
