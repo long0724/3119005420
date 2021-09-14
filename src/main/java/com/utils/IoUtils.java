@@ -10,17 +10,17 @@ public class IoUtils {
     /*
        读取文本txt文件，返回字符串
      */
-    public static String read(String path) throws IOException {
+    public static String read(String path) {
 
         //将读出的字符串用StringBuilder连接。
         StringBuilder builder = new StringBuilder();
-        String text=null;
-        File afile=new File(path);
+        String text;
+        File file=new File(path);
         //判断其是否为文件并且是否存在
             try{
                 String encoding="UTF-8";
-                if(afile.isFile() && afile.exists()) { //判断读取的文件是否存在和是否为文件类型
-                    FileInputStream fileInputStream = new FileInputStream(afile);
+                if(file.isFile() && file.exists()) { //判断读取的文件是否存在和是否为文件类型
+                    FileInputStream fileInputStream = new FileInputStream(file);
                     InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, encoding);
                     BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                     while ((text = bufferedReader.readLine()) != null) {
@@ -42,9 +42,7 @@ public class IoUtils {
         return builder.toString();
     }
 
-      public static void write(String path, double resultrate) throws IOException {
-        //将double类型数据转为String类型
-          String result=Double.toString(resultrate);
+      public static void write(String path, String result) {
           BufferedWriter out=null;
           try{
               out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path,true)));
@@ -58,7 +56,9 @@ public class IoUtils {
           finally {
               try{
                   //输出流关闭
-                  out.close();
+                  if (out != null) {
+                      out.close();
+                  }
               }catch (IOException e){
                   System.out.println("输出流关闭失败");
                   e.printStackTrace();

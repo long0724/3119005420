@@ -4,26 +4,23 @@ import com.utils.CalSimHashUtil;
 import com.utils.IoUtils;
 import org.junit.Test;
 
-import java.io.IOException;
-
 import static com.utils.CalSimHashUtil.getSimHash;
 
 public class CalSimHashUtilTest {
 
     @Test
-    public void getHashTest() throws IOException {
+    public void getHashTest() {
         //用某些字符串和空串测试
         String[] str =new String[]{"一位","真正的","作家",""};
-        for(int i=0;i<str.length;i++){
-            String hash = CalSimHashUtil.getHash(str[i]);
+        for (String s : str) {
+            String hash = CalSimHashUtil.getHash(s);
             //返回某个字符串计算得出的hash值
-            System.out.println(str[i]+"对应的hash-->"+hash);
+            System.out.println(s + "对应的hash-->" + hash);
         }
-        return;
     }
 
     @Test
-    public void getSimHashTest() throws IOException {
+    public void getSimHashTest() {
         //计算两个文件的simhash值
         String str0 = IoUtils.read("C:/tests/org.txt");
         String str1 = IoUtils.read("C:/tests/orig_0.8_del.txt");
